@@ -1,3 +1,4 @@
+using System.Collections;
 using Photon.Pun;
 using UnityEngine;
 
@@ -8,12 +9,19 @@ public class ThisIsALandmine : MonoBehaviour
 	[SerializeField] public SFX_PlayOneShot beep;
 	[SerializeField] public SFX_PlayOneShot press;
 	[SerializeField] public SFX_PlayOneShot explosion;
+
+	[SerializeField] public Light light;
 	
 	private float beepTimer = 0f;
 #pragma warning disable CS0414
 	private bool exploding = false;
 #pragma warning restore CS0414
-	
+
+	private void Awake()
+	{
+		Destroy(GetComponentInParent<Pickup>());
+	}
+
 	private void OnTriggerEnter(Collider other)
 	{
 		if (exploding)
@@ -28,15 +36,15 @@ public class ThisIsALandmine : MonoBehaviour
 		exploding = true;
 		
 		press.Play();
-		press.afterPlayAction = Explode;
+		Explode();
 			
-		// Destroy(gameObject);
+		Destroy(gameObject);
 	}
 
 	private void Update()
 	{
 		beepTimer += Time.deltaTime;
-		if (beepTimer >= 1f)
+		if (beepTimer >= 15f)
 			Beep();
 	}
 	
@@ -44,14 +52,22 @@ public class ThisIsALandmine : MonoBehaviour
 	{
 		beepTimer = 0f;
 		beep.Play();
+		StartCoroutine(BeepLight());
+	}
+	
+	private IEnumerator BeepLight()
+	{
+		// flash light
+		light.gameObject.SetActive(true);
+		yield return new WaitForSeconds(0.35f);
+		light.gameObject.SetActive(false);
 	}
 	
 	public void Explode()
 	{
 		var explosionPrefab = LandminePlugin.Bundle.GetAssetByName<GameObject>("Explosion");
-		var inst = Instantiate(explosionPrefab, transform.position, Quaternion.identity, transform);
+		Instantiate(explosionPrefab, null);
 		
 		explosion.Play();
-		Destroy(gameObject);
 	}
 }

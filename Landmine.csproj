@@ -28,6 +28,7 @@
 
     <Target Name="CopyOutputFileToGame" AfterTargets="AfterBuild">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(CWDir)\BepInEx\Plugins\"/>
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(UnityPluginsDir)"/>
     </Target>
 
 </Project>
