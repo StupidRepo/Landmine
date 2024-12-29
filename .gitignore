@@ -1,0 +1,7 @@
+.idea
+bin
+obj
+*.DotSettings.user
+*.user
+AssetBundles/*.manifest
+AssetBundles/AssetBundles
