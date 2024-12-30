@@ -1,12 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
-        <NoWarn>8618</NoWarn>
+        <NoWarn>8618;MSB3026</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
@@ -20,6 +20,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="RugbugRedfern.MyceliumNetworking.CW" Version="1.0.14" />
     </ItemGroup>
     
     <ItemGroup>
@@ -27,7 +28,7 @@
     </ItemGroup>
 
     <Target Name="CopyOutputFileToGame" AfterTargets="AfterBuild">
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(CWDir)\BepInEx\Plugins\"/>
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(CWDir)\BepInEx\Plugins\" Retries="60"/>
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(UnityPluginsDir)"/>
     </Target>
 

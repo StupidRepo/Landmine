@@ -1,8 +1,6 @@
 ﻿using System.Reflection;
 using BepInEx;
-using BepInEx.Unity.Mono;
 using HarmonyLib;
-using Landmine.Components;
 using UnityEngine;
 using Zorro.Core;
 
@@ -13,6 +11,9 @@ public class LandminePlugin : BaseUnityPlugin
 {
 	private static AssetBundle OurAssetBundle;
 	public static AssetBundleHandler Bundle;
+
+	public const uint ModID = 95142;
+	public const int SpawnCount = 100; // How many mines to spawn in a map.
 
 	private void Awake()
 	{
@@ -25,8 +26,25 @@ public class LandminePlugin : BaseUnityPlugin
 		Bundle = new AssetBundleHandler(OurAssetBundle);
 		
 		// Register items
-		RegisterItem<BuyableLandmineItem>(Bundle.GetAssetByName<Item>("BuyableLandmineItem"));
-		RegisterItem<ThisIsALandmine>(Bundle.GetAssetByName<Item>("SpawnableLandmineItem"));
+		RegisterItem(Bundle.GetAssetByName<Item>("SpawnableLandmineItem"));
+	}
+
+	private void RegisterItem(Item? item)
+	{
+		if (item == null)
+		{
+			Debug.LogError("Item is null");
+			return;
+		}
+		
+		Debug.LogWarning("Adding item: " + item.displayName); 
+			
+		// item.purchasable = true;
+		// item.spawnable = true;
+		
+		item.price = item.price > 0 ? item.price : 5;
+		
+		SingletonAsset<ItemDatabase>.Instance.AddRuntimeEntry(item);
 	}
 
 	void RegisterItem<T>(Item? item) where T : Component
@@ -42,7 +60,7 @@ public class LandminePlugin : BaseUnityPlugin
 		// item.purchasable = true;
 		// item.spawnable = true;
 
-		// item.itemObject.AddComponent<T>();
+		item.itemObject.AddComponent<T>();
 		item.price = item.price > 0 ? item.price : 5;
 		
 		SingletonAsset<ItemDatabase>.Instance.AddRuntimeEntry(item);
