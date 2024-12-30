@@ -31,7 +31,7 @@ public class LandminePlugin : BaseUnityPlugin
 		
 		Instance = this;
 		
-		// Load embedded asset bundle
+		// Load embedded asset bundle+
 		using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Landmine.AssetBundles.ab");
 		OurAssetBundle = AssetBundle.LoadFromStream(stream);
 		Bundle = new AssetBundleHandler(OurAssetBundle);
