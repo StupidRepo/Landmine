@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
-using MyceliumNetworking;
 using Photon.Pun;
 using UnityEngine;
+using Zorro.Core;
 using Random = UnityEngine.Random;
 
 namespace Landmine.ItemUtils;
@@ -16,17 +16,8 @@ public class RoundArtifactSpawnerPatches
         if (!PhotonNetwork.IsMasterClient) return; // only the master client should spawn, we'll RPC to the clients
         for (var i = 0; i < LandminePlugin.SpawnCount; i++)
         {
-            List<PatrolPoint> pointsInGroups = Level.currentLevel.GetPointsInGroups(new List<PatrolPoint.PatrolGroup>
-            {
-                PatrolPoint.PatrolGroup.Bear, // tf are these names??
-                PatrolPoint.PatrolGroup.Dog,
-                PatrolPoint.PatrolGroup.Ant,
-                PatrolPoint.PatrolGroup.Bird,
-                PatrolPoint.PatrolGroup.Cat,
-                PatrolPoint.PatrolGroup.Fish,
-                PatrolPoint.PatrolGroup.Wolf
-            });
-            LandminePlugin.Instance.DoRPC(pointsInGroups[Random.Range(0, pointsInGroups.Count)].transform.position);
+            List<PatrolPoint> pointsInGroups = Level.currentLevel.patrolGroups.SelectMany(x => x.Value).ToList();
+            PhotonNetwork.Instantiate("Landmine", pointsInGroups.GetRandom().transform.position, Quaternion.identity);
         }
     }
 }

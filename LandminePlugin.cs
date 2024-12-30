@@ -1,9 +1,12 @@
 ﻿using System.Reflection;
 using BepInEx;
 using HarmonyLib;
+using Landmine.Components;
 using MyceliumNetworking;
+using Photon.Pun;
 using UnityEngine;
 using Zorro.Core;
+using Zorro.Core.CLI;
 using Random = UnityEngine.Random;
 
 namespace Landmine;
@@ -15,6 +18,8 @@ public class LandminePlugin : BaseUnityPlugin
 	
 	private static AssetBundle OurAssetBundle;
 	public static AssetBundleHandler Bundle;
+	
+	public Dictionary<string, Item> RegisteredItems = new();
 
 	public const uint ModID = 95142;
 	public const int SpawnCount = 30; // How many mines to spawn in a map.
@@ -32,12 +37,14 @@ public class LandminePlugin : BaseUnityPlugin
 		Bundle = new AssetBundleHandler(OurAssetBundle);
 		
 		// Register items
-		RegisterItem(Bundle.GetAssetByName<Item>("SpawnableLandmineItem"));
+		RegisterItem(Bundle.GetAssetByName<Item>("SpawnableLandmineItem"), "Landmine");
+		// PUNPoolAddOurRegisteredItems();
 		
-		MyceliumNetwork.RegisterNetworkObject(this, ModID);
+		// MyceliumNetwork.LobbyCreated += PUNPoolAddOurRegisteredItems;
+		// MyceliumNetwork.LobbyEntered += PUNPoolAddOurRegisteredItems;
 	}
 
-	private void RegisterItem(Item? item)
+	private void RegisterItem(Item? item, string photonName, bool addToDB = false)
 	{
 		if (item == null)
 		{
@@ -52,41 +59,58 @@ public class LandminePlugin : BaseUnityPlugin
 		
 		item.price = item.price > 0 ? item.price : 5;
 		
-		SingletonAsset<ItemDatabase>.Instance.AddRuntimeEntry(item);
+		if(addToDB)
+			SingletonAsset<ItemDatabase>.Instance.AddRuntimeEntry(item);
+		
+		RegisteredItems.Add(photonName, item);
 	}
 
-	void RegisterItem<T>(Item? item) where T : Component
+	void RegisterItem<T>(Item? item, string photonName, bool addToDB = false) where T : Component
 	{
 		if (item == null)
 		{
 			Debug.LogError("Item is null");
 			return;
 		}
-		
-		Debug.LogWarning("Adding item: " + item.displayName); 
-			
+
+		Debug.LogWarning("Adding item: " + item.displayName);
+
 		// item.purchasable = true;
 		// item.spawnable = true;
 
 		item.itemObject.AddComponent<T>();
 		item.price = item.price > 0 ? item.price : 5;
+
+		if (addToDB)
+			SingletonAsset<ItemDatabase>.Instance.AddRuntimeEntry(item);
 		
-		SingletonAsset<ItemDatabase>.Instance.AddRuntimeEntry(item);
+		RegisteredItems.Add(photonName, item);
 	}
-
-	public void DoRPC(Vector3 position)
+	
+	public void PUNPoolAddOurRegisteredItems()
 	{
-		MyceliumNetwork.RPC(ModID, nameof(DoLandmineSpawn), ReliableType.Reliable, position);
+		foreach (var item in RegisteredItems)
+		{
+			((DefaultPool)PhotonNetwork.prefabPool).ResourceCache.Add(item.Key, item.Value.itemObject);
+			Debug.LogWarning("Registering item with PUN pool: " + item.Value.displayName);
+		}
 	}
-
-	[CustomRPC]
-	public void DoLandmineSpawn(Vector3 position)
+	
+	[ConsoleCommand]
+	public static void SpawnLandmine()
 	{
-		PickupHandler.CreatePickup(
-			Bundle.GetAssetByName<Item>("SpawnableLandmineItem")!.id,
-			new ItemInstanceData(Guid.NewGuid()), 
-			position,
-			Quaternion.identity
-		);
+		// spawn landmine a little bit in front of player
+		var player = Player.localPlayer;
+		if (player == null)
+		{
+			Debug.LogError("Player is null");
+			return;
+		}
+		
+		if(!PhotonNetwork.IsMasterClient)
+			return;
+
+		var go = PhotonNetwork.Instantiate("Landmine", MainCamera.instance.GetDebugItemSpawnPos(), Quaternion.identity);
 	}
 }
+
