@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using MyceliumNetworking;
+using Photon.Pun;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -11,8 +13,7 @@ public class RoundArtifactSpawnerPatches
     [HarmonyPostfix]
     public static void CreateOurLandmine(ref RoundArtifactSpawner __instance)
     {
-        Debug.LogWarning("Creating landmines!");
-        
+        if (!PhotonNetwork.IsMasterClient) return; // only the master client should spawn, we'll RPC to the clients
         for (var i = 0; i < LandminePlugin.SpawnCount; i++)
         {
             List<PatrolPoint> pointsInGroups = Level.currentLevel.GetPointsInGroups(new List<PatrolPoint.PatrolGroup>
@@ -25,11 +26,7 @@ public class RoundArtifactSpawnerPatches
                 PatrolPoint.PatrolGroup.Fish,
                 PatrolPoint.PatrolGroup.Wolf
             });
-            var lol = PickupHandler.CreatePickup(
-                LandminePlugin.Bundle.GetAssetByName<Item>("SpawnableLandmineItem")!.id,
-                new ItemInstanceData(Guid.NewGuid()), 
-                pointsInGroups[Random.Range(0, pointsInGroups.Count)].transform.position,
-                Random.rotation);
+            LandminePlugin.Instance.DoRPC(pointsInGroups[Random.Range(0, pointsInGroups.Count)].transform.position);
         }
     }
 }

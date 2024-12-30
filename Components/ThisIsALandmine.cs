@@ -21,6 +21,8 @@ public class ThisIsALandmine : MonoBehaviour
 	private bool exploding = false;
 #pragma warning restore CS0414
 
+	private float timeSinceSpawn = 0;
+
 	private void Awake()
 	{
 		Destroy(GetComponentInParent<Pickup>());
@@ -29,11 +31,12 @@ public class ThisIsALandmine : MonoBehaviour
 	private void Start()
 	{
 		MyceliumNetwork.RegisterNetworkObject(this, LandminePlugin.ModID, itemInstance.m_syncer.m_photonView.ViewID);
+		Debug.Log(itemInstance.m_syncer.m_photonView.ViewID);
 	}
 
 	private void OnCollisionEnter(Collision other)
 	{
-		if (exploding || !enabled)
+		if (exploding || !enabled || !PhotonNetwork.IsMasterClient)
 			return;
 		
 		// Debug.LogError(other.gameObject.name);
@@ -42,12 +45,22 @@ public class ThisIsALandmine : MonoBehaviour
 		if (player == null)
 		{
 			var iInstance = other.gameObject.GetComponentInChildren<ItemInstance>();
-			if (iInstance == null || !iInstance.m_syncer.isMine || iInstance.isHeld) 
+			if (iInstance == null || iInstance.isHeld) 
 			{
 				return; // if itemInstance and player is null, not mine, or is held, return
 			};
 		}
-		if (player != null && !player.photonView.IsMine) return; // if player exists but is not mine, return
+		if (player != null) return; // if player exists but is not mine, return
+		
+		if (timeSinceSpawn < 0.5f)
+		{
+			Debug.LogError("Just spawned in and collided with something, must be invalid spawn");
+			Destroy(gameObject); // if spawned in and collided with something, destroy
+			
+			return;
+		}
+		
+		Debug.Log(itemInstance.m_syncer.m_photonView.ViewID);
 		
 		exploding = true;
 		MyceliumNetwork.RPCMasked(LandminePlugin.ModID, nameof(Explode), ReliableType.Reliable, itemInstance.m_syncer.m_photonView.ViewID);
@@ -57,7 +70,8 @@ public class ThisIsALandmine : MonoBehaviour
 	{
 		if(!enabled)
 			return;
-		
+
+		timeSinceSpawn += Time.deltaTime;
 		beepTimer += Time.deltaTime;
 		if (beepTimer >= 15f)
 			Beep();
@@ -96,7 +110,7 @@ public class ThisIsALandmine : MonoBehaviour
 
 		var explosionPrefab = LandminePlugin.Bundle.GetAssetByName<GameObject>("Explosion");
 		Instantiate(explosionPrefab, transform.position, Quaternion.identity, null);
-
+		
 		explosion.Play();
 		Destroy(gameObject);
 	}
