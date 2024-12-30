@@ -38,10 +38,9 @@ public class LandminePlugin : BaseUnityPlugin
 		
 		// Register items
 		RegisterItem(Bundle.GetAssetByName<Item>("SpawnableLandmineItem"), "Landmine");
-		// PUNPoolAddOurRegisteredItems();
 		
-		// MyceliumNetwork.LobbyCreated += PUNPoolAddOurRegisteredItems;
-		// MyceliumNetwork.LobbyEntered += PUNPoolAddOurRegisteredItems;
+		MyceliumNetwork.LobbyCreated += PUNPoolAddOurRegisteredItems;
+		MyceliumNetwork.LobbyEntered += PUNPoolAddOurRegisteredItems;
 	}
 
 	private void RegisterItem(Item? item, string photonName, bool addToDB = false)
