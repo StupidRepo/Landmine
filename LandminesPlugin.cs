@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using INeedWorkshopDeps.Attributes;
+using Itemz;
 using Photon.Pun;
 using UnityEngine;
 using Zorro.Core.CLI;
@@ -7,7 +8,8 @@ using Zorro.Core.CLI;
 namespace Landmines;
 
 [ContentWarningPlugin("stupidrepo.Landmines", "0.1", false)]
-[ContentWarningDependency(3384690922)]
+[ContentWarningDependency(3384690922)] // MyceliumNetworking
+[ContentWarningDependency(3397332899)] // Itemz
 public static class LandminePlugin
 {
 	public static readonly AssetBundleHandler Bundle;
@@ -21,8 +23,7 @@ public static class LandminePlugin
 		var ourAssetBundle = AssetBundle.LoadFromStream(stream);
 		Bundle = new AssetBundleHandler(ourAssetBundle);
 		
-		// Register items
-		Itemz.Itemz.RegisterItem(Bundle.GetAssetByName<Item>("SpawnableLandmineItem"), "Landmine");
+		Itemz.Itemz.RegisterItem(Bundle.GetAssetByName<Item>("SpawnableLandmineItem"), "Landmine", false);
 	}
 	
 	[ConsoleCommand]

@@ -29,7 +29,6 @@ public class ThisIsALandmine : MonoBehaviour
 		
 		viewId = pv.ViewID;
 		
-		Debug.LogError("HELLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOoOOOOOOOOOOOOOOOOOOOOOOOOO WE ARE PV PV PV PV PV: " + pv.ViewID);
 		MyceliumNetwork.RegisterNetworkObject(this, LandminePlugin.ModID, pv.ViewID);
 	}
 	
@@ -46,14 +45,13 @@ public class ThisIsALandmine : MonoBehaviour
 			var iInstance = other.gameObject.GetComponentInChildren<ItemInstance>();
 			if (iInstance == null || iInstance.isHeldByMe)
 			{
-				Debug.LogError("Not a player or item instance");
-				return; // if itemInstance and player is null, not mine, or is held, return
+				return; // if itemInstance and player is null, or is held, return
 			};
 		}
 		
 		if (timeSinceSpawn < 0.5f)
 		{
-			Debug.LogError("Just spawned in and collided with something, must be invalid spawn");
+			Debug.LogWarning("Just spawned in and collided with something, must be invalid spawn");
 			Destroy(gameObject); // if spawned in and collided with something, destroy
 			
 			return;
