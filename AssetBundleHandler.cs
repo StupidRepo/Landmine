@@ -1,4 +1,4 @@
-namespace Landmine;
+namespace Landmines;
 
 using System.Collections.Generic;
 using UnityEngine;

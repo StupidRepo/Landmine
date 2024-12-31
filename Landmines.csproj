@@ -6,12 +6,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
         <NoWarn>8618;MSB3026</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <Reference Include="$(CWDir)\Content Warning_Data\Managed\*.dll" Private="false" Publicize="True"/>
-        <Reference Include="$(CWDir)\BepInEx\core\Bep*.dll" Private="false" Publicize="True" />
+        <Reference Include="$(CWDir)\Plugins\Itemz\*.dll" Private="false"/>
+        <Reference Include="$(MSBuildProjectDirectory)\Libs\*.dll" />
+<!--        <Reference Include="$(CWDir)\BepInEx\core\Bep*.dll" Private="false" Publicize="True" />-->
     </ItemGroup>
 
     <!-- Use BepInEx's Assembly Publicizer to tell IDEs and the compiler that every field, method, etc. is public, in the game assemblies -->
@@ -22,13 +25,12 @@
         </PackageReference>
         <PackageReference Include="RugbugRedfern.MyceliumNetworking.CW" Version="1.0.14" />
     </ItemGroup>
-    
     <ItemGroup>
-      <EmbeddedResource Include="AssetBundles\ab" />
+      <Folder Include="AssetBundles\" />
     </ItemGroup>
 
     <Target Name="CopyOutputFileToGame" AfterTargets="Build">
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(CWDir)\BepInEx\Plugins\" Retries="1000" RetryDelayMilliseconds="100"/>
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll;preview.png" DestinationFolder="$(CWDir)\Plugins\$(AssemblyName)\" Retries="60"/>
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(UnityPluginsDir)"/>
     </Target>
 

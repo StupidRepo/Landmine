@@ -2,9 +2,8 @@ using System.Collections;
 using MyceliumNetworking;
 using Photon.Pun;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-namespace Landmine.Components;
+namespace Landmines.Components;
 
 public class ThisIsALandmine : MonoBehaviour
 {
