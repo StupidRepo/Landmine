@@ -28,7 +28,6 @@ public class RoundArtifactSpawnerPatches
 		Debug.LogWarning($"About to spawn landmines - minY: {minY}, maxY: {maxY}");
 
 		var overallSpawnCount = 0;
-		
 		var possibleSpawnLocations = new List<Vector3>();
 
 		for (var i = 0; i < LandminesPlugin.PossibleSpawnCount; i++)
