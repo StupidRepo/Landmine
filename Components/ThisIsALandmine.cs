@@ -18,7 +18,9 @@ public class ThisIsALandmine : MonoBehaviour
 	private float beepTimer = 0f;
 	private float timeSinceSpawn = 0;
 	
-	private List<Player> players = new();
+	private readonly List<Player> players = new();
+	
+	public bool exploding = false;
 	
 	private void Awake()
 	{
@@ -44,7 +46,7 @@ public class ThisIsALandmine : MonoBehaviour
 				return; // if itemInstance and player is null, or is held, return
 			}
 
-			CallRPCExplode(); // explode if touched by item
+			if(!exploding) CallRPCExplode(); // explode if touched by item
 			return;
 		}
 		
@@ -67,8 +69,9 @@ public class ThisIsALandmine : MonoBehaviour
 		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(SteppedOn), ReliableType.Reliable, viewId);
 	}
 	
-	private void CallRPCExplode()
+	public void CallRPCExplode()
 	{
+		exploding = true;
 		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(Explode), ReliableType.Reliable, viewId);
 	}
 	
@@ -82,6 +85,7 @@ public class ThisIsALandmine : MonoBehaviour
 	[CustomRPC]
 	public void Explode()
 	{
+		exploding = true;
 		var explosionPrefab = LandminesPlugin.Bundle.GetAssetByName<GameObject>("Explosion")!;
 		
 		Instantiate(explosionPrefab, transform.position, Quaternion.identity, null);
@@ -105,7 +109,7 @@ public class ThisIsALandmine : MonoBehaviour
 
 		if (!players.Any()) return;
 		
-		Collider[] colliders = Physics.OverlapSphere(transform.position, 1.1f);
+		Collider[] colliders = Physics.OverlapSphere(transform.position, 1.5f);
 		var playerStillOnMine = false;
 		
 		foreach (var collider in colliders)
@@ -116,7 +120,7 @@ public class ThisIsALandmine : MonoBehaviour
 			break;
 		}
 
-		if (!playerStillOnMine)
+		if (!playerStillOnMine && !exploding)
 			CallRPCExplode();
 	}
 	
