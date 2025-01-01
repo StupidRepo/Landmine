@@ -18,7 +18,7 @@ public static class LandminesPlugin
 	
 	public const int SpawnCount = 300;
 	public const int SampleCount = 50;
-	public const int SpawnRadius = 12;
+	public const int SpawnRadius = 9;
 
 	static LandminesPlugin()
 	{
