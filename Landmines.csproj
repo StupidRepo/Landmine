@@ -14,6 +14,7 @@
         <Reference Include="$(CWDir)\Content Warning_Data\Managed\*.dll" Private="false" Publicize="True"/>
         <Reference Include="$(CWDir)\Plugins\Itemz\*.dll" Private="false"/>
         <Reference Include="$(MSBuildProjectDirectory)\Libs\*.dll" />
+        <Reference Include="C:\Program Files (x86)\Steam\steamapps\workshop\content\2881650\*\*.dll" Publicize="True" />
 <!--        <Reference Include="$(CWDir)\BepInEx\core\Bep*.dll" Private="false" Publicize="True" />-->
     </ItemGroup>
 
@@ -32,7 +33,7 @@
 
     <Target Name="CopyOutputFileToGame" AfterTargets="Build">
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll;preview.png" DestinationFolder="$(CWDir)\Plugins\$(AssemblyName)\" Retries="60"/>
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(UnityPluginsDir)"/>
+<!--        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(UnityPluginsDir)"/>-->
     </Target>
 
 </Project>

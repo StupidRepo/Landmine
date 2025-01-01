@@ -26,10 +26,9 @@ public class ThisIsALandmine : MonoBehaviour
 	private void Awake()
 	{
 		var pv = gameObject.GetComponent<PhotonView>();
-		
 		viewId = pv.ViewID;
 		
-		MyceliumNetwork.RegisterNetworkObject(this, LandminePlugin.ModID, pv.ViewID);
+		MyceliumNetwork.RegisterNetworkObject(this, LandminesPlugin.ModID, pv.ViewID);
 	}
 	
 	private void OnCollisionEnter(Collision other)
@@ -37,7 +36,7 @@ public class ThisIsALandmine : MonoBehaviour
 		if (exploding || !enabled || !PhotonNetwork.IsMasterClient)
 			return;
 		
-		Debug.LogError(other.gameObject.name);
+		// Debug.LogError(other.gameObject.name);
 		
 		var player = other.gameObject.GetComponentInParent<Player>();
 		if (player == null)
@@ -63,7 +62,7 @@ public class ThisIsALandmine : MonoBehaviour
 	
 	private void CallRPCExplode()
 	{
-		MyceliumNetwork.RPCMasked(LandminePlugin.ModID, nameof(Explode), ReliableType.Reliable, viewId);
+		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(Explode), ReliableType.Reliable, viewId);
 	}
 	
 	[CustomRPC]
@@ -77,7 +76,7 @@ public class ThisIsALandmine : MonoBehaviour
 		press.Play();
 		yield return new WaitForSeconds(0.2f);
 
-		var explosionPrefab = LandminePlugin.Bundle.GetAssetByName<GameObject>("Explosion");
+		var explosionPrefab = LandminesPlugin.Bundle.GetAssetByName<GameObject>("Explosion");
 		Instantiate(explosionPrefab, transform.position, Quaternion.identity, null);
 		
 		explosion.Play();
@@ -112,6 +111,6 @@ public class ThisIsALandmine : MonoBehaviour
 	private void OnDestroy()
 	{
 		Debug.LogError("DE REG");
-		MyceliumNetwork.DeregisterNetworkObject(this, LandminePlugin.ModID, viewId);
+		MyceliumNetwork.DeregisterNetworkObject(this, LandminesPlugin.ModID, viewId);
 	}
 }
