@@ -17,9 +17,9 @@ public static class LandminesPlugin
 	public const uint ModID = 534233;
 	
 	public const int PossibleSpawnCount = 250;
-	public const int SampleCount = 5;
+	public const int SampleCount = 50;
 	
-	public const int SpawnRadius = 12;
+	public const int SpawnRadius = 9;
 
 	static LandminesPlugin()
 	{
