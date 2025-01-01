@@ -24,8 +24,7 @@ public static class LandminesPlugin
 	static LandminesPlugin()
 	{
 		using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Landmines.AssetBundles.ab");
-		var ourAssetBundle = AssetBundle.LoadFromStream(stream);
-		Bundle = new AssetBundleHandler(ourAssetBundle);
+		Bundle = new AssetBundleHandler(AssetBundle.LoadFromStream(stream));
 		
 		Itemz.Itemz.RegisterItem(Bundle.GetAssetByName<Item>("SpawnableLandmineItem"), "Landmine", false);
 	}
