@@ -51,7 +51,6 @@ public class RoundArtifactSpawnerPatches
 
 	private static void DoSampling(ref Bounds bounds, ref float minY, ref float maxY)
 	{
-		// Sample multiple points to determine a suitable y-coordinate range
 		for (var i = 0; i < LandminesPlugin.SampleCount; i++)
 		{
 			var samplePosition = new Vector3(
