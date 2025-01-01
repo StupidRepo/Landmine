@@ -13,16 +13,13 @@ public class ThisIsALandmine : MonoBehaviour
 
 	[SerializeField] public Light light;
 
-	public int viewId = 0;
+	private int viewId = 0;
 	
 	private float beepTimer = 0f;
-#pragma warning disable CS0414
-	private bool exploding = false;
-#pragma warning restore CS0414
-
 	private float timeSinceSpawn = 0;
-	// private int viewId;
-
+	
+	private List<Player> players = new List<Player>();
+	
 	private void Awake()
 	{
 		var pv = gameObject.GetComponent<PhotonView>();
@@ -30,10 +27,10 @@ public class ThisIsALandmine : MonoBehaviour
 		
 		MyceliumNetwork.RegisterNetworkObject(this, LandminesPlugin.ModID, pv.ViewID);
 	}
-	
+
 	private void OnCollisionEnter(Collision other)
 	{
-		if (exploding || !enabled || !PhotonNetwork.IsMasterClient)
+		if (!enabled || !PhotonNetwork.IsMasterClient)
 			return;
 		
 		// Debug.LogError(other.gameObject.name);
@@ -45,7 +42,10 @@ public class ThisIsALandmine : MonoBehaviour
 			if (iInstance == null || iInstance.isHeldByMe)
 			{
 				return; // if itemInstance and player is null, or is held, return
-			};
+			}
+
+			CallRPCExplode(); // explode if touched by item
+			return;
 		}
 		
 		if (timeSinceSpawn < 0.5f)
@@ -55,9 +55,16 @@ public class ThisIsALandmine : MonoBehaviour
 			
 			return;
 		}
+
+		if(players.Any()) return;
 		
-		exploding = true;
-		CallRPCExplode();
+		players.Add(player);
+		CallRPCSteppedOn();
+	}
+
+	private void CallRPCSteppedOn()
+	{
+		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(SteppedOn), ReliableType.Reliable, viewId);
 	}
 	
 	private void CallRPCExplode()
@@ -66,20 +73,15 @@ public class ThisIsALandmine : MonoBehaviour
 	}
 	
 	[CustomRPC]
-	public void Explode()
-	{
-		StartCoroutine(ExplodeCoroutine());
-	}
-	
-	private IEnumerator ExplodeCoroutine()
+	public void SteppedOn()
 	{
 		press.Play();
-		yield return new WaitForSeconds(0.2f);
-
+	}
+	
+	[CustomRPC]
+	public void Explode()
+	{
 		var explosionPrefab = LandminesPlugin.Bundle.GetAssetByName<GameObject>("Explosion")!;
-		var expl = explosionPrefab.GetComponent<AOE>();
-		Debug.LogWarning(expl.radius);
-		expl.force = 30f;
 		
 		Instantiate(explosionPrefab, transform.position, Quaternion.identity, null);
 		
@@ -95,18 +97,32 @@ public class ThisIsALandmine : MonoBehaviour
 		timeSinceSpawn += Time.deltaTime;
 		beepTimer += Time.deltaTime;
 		if (beepTimer >= 15f)
-			Beep();
-	}
-	
-	public void Beep()
-	{
-		beepTimer = 0f;
-		beep.Play();
-		StartCoroutine(BeepLight());
+		{
+			beepTimer = 0f;
+			StartCoroutine(BeepLight());
+		}
+
+		if (!players.Any()) return;
+		
+		Collider[] colliders = Physics.OverlapSphere(transform.position, 1.5f);
+		var playerStillOnMine = false;
+		
+		foreach (var collider in colliders)
+		{
+			if (collider.GetComponentInParent<Player>() == null) continue;
+			
+			playerStillOnMine = true;
+			break;
+		}
+
+		if (!playerStillOnMine)
+			CallRPCExplode();
 	}
 	
 	private IEnumerator BeepLight()
 	{
+		beep.Play();
+		
 		light.gameObject.SetActive(true);
 		yield return new WaitForSeconds(0.35f);
 		light.gameObject.SetActive(false);
@@ -114,7 +130,6 @@ public class ThisIsALandmine : MonoBehaviour
 	
 	private void OnDestroy()
 	{
-		Debug.LogError("DE REG");
 		MyceliumNetwork.DeregisterNetworkObject(this, LandminesPlugin.ModID, viewId);
 	}
 }
