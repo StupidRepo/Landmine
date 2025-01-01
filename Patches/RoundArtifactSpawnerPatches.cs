@@ -31,7 +31,7 @@ public class RoundArtifactSpawnerPatches
 		
 		var possibleSpawnLocations = new List<Vector3>();
 
-		for (var i = 0; i < LandminesPlugin.SpawnCount; i++)
+		for (var i = 0; i < LandminesPlugin.PossibleSpawnCount; i++)
 		{
 			var randomPosition = nmSurface.GetRandomPosition(minY, maxY);
 			if (randomPosition == Vector3.zero) continue;
@@ -46,7 +46,7 @@ public class RoundArtifactSpawnerPatches
 			overallSpawnCount++;
 		}
 		
-		Debug.LogWarning($"Spawned {overallSpawnCount} of {LandminesPlugin.SpawnCount} landmines");
+		Debug.LogWarning($"Spawned {overallSpawnCount} of {LandminesPlugin.PossibleSpawnCount} landmines");
 	}
 
 	private static void DoSampling(ref Bounds bounds, ref float minY, ref float maxY)
