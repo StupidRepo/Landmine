@@ -36,7 +36,7 @@ public static class LandminesPlugin
 		if (player == null)
 		{
 			Debug.LogError("Player is null");
-			return;
+			return; 
 		}
 		
 		if(!PhotonNetwork.IsMasterClient)

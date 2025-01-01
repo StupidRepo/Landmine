@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>latest</LangVersion>
-        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         <NoWarn>8618;MSB3026</NoWarn>
     </PropertyGroup>
 

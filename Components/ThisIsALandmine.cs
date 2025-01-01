@@ -18,7 +18,7 @@ public class ThisIsALandmine : MonoBehaviour
 	private float beepTimer = 0f;
 	private float timeSinceSpawn = 0;
 	
-	private List<Player> players = new List<Player>();
+	private List<Player> players = new();
 	
 	private void Awake()
 	{
@@ -76,6 +76,7 @@ public class ThisIsALandmine : MonoBehaviour
 	public void SteppedOn()
 	{
 		press.Play();
+		GetComponent<Rigidbody>().isKinematic = true;
 	}
 	
 	[CustomRPC]
@@ -104,7 +105,7 @@ public class ThisIsALandmine : MonoBehaviour
 
 		if (!players.Any()) return;
 		
-		Collider[] colliders = Physics.OverlapSphere(transform.position, 1.5f);
+		Collider[] colliders = Physics.OverlapSphere(transform.position, 1.1f);
 		var playerStillOnMine = false;
 		
 		foreach (var collider in colliders)
