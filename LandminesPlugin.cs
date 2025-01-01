@@ -8,7 +8,7 @@ using Zorro.Core.CLI;
 
 namespace Landmines;
 
-[ContentWarningPlugin("stupidrepo.Landmines", "0.2", false)]
+[ContentWarningPlugin("stupidrepo.Landmines", "0.3", false)]
 [ContentWarningDependency(3384690922)] // MyceliumNetworking
 [ContentWarningDependency(3397332899)] // Itemz
 public static class LandminesPlugin
