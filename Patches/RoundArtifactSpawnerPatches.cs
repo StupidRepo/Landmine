@@ -17,34 +17,36 @@ public class RoundArtifactSpawnerPatches
 	{
 		if (!PhotonNetwork.IsMasterClient) return;
 
-		var nmSurface = NavMeshSurface.s_NavMeshSurfaces.First();
-		var bounds = nmSurface.navMeshData.sourceBounds;
-		
-		var minY = bounds.max.y;
-		var maxY = bounds.min.y;
-
-		DoSampling(ref bounds, ref minY, ref maxY);
-		
-		Debug.LogWarning($"About to spawn landmines - minY: {minY}, maxY: {maxY}");
-
 		var overallSpawnCount = 0;
-		var possibleSpawnLocations = new List<Vector3>();
+		NavMeshSurface.s_NavMeshSurfaces.ForEach(nmSurface =>
+		{
+			var bounds = nmSurface.navMeshData.sourceBounds;
 
-		for (var i = 0; i < LandminesPlugin.PossibleSpawnCount; i++)
-		{
-			var randomPosition = nmSurface.GetRandomPosition(minY, maxY);
-			if (randomPosition == Vector3.zero) continue;
-			if (IsLocationOccupied(randomPosition, LandminesPlugin.SpawnRadius, possibleSpawnLocations)) continue;
-			
-			possibleSpawnLocations.Add(randomPosition);
-		}
-		
-		foreach (var spawnLocation in possibleSpawnLocations)
-		{
-			PhotonNetwork.Instantiate("Landmine", spawnLocation, Quaternion.identity);
-			overallSpawnCount++;
-		}
-		
+			var minY = bounds.max.y;
+			var maxY = bounds.min.y;
+
+			DoSampling(ref bounds, ref minY, ref maxY);
+
+			Debug.LogWarning($"About to spawn landmines - minY: {minY}, maxY: {maxY}");
+
+			var possibleSpawnLocations = new List<Vector3>();
+
+			for (var i = 0; i < LandminesPlugin.PossibleSpawnCount / NavMeshSurface.s_NavMeshSurfaces.Count; i++)
+			{
+				var randomPosition = nmSurface.GetRandomPosition(minY, maxY);
+				if (randomPosition == Vector3.zero) continue;
+				if (IsLocationOccupied(randomPosition, LandminesPlugin.SpawnRadius, possibleSpawnLocations)) continue;
+
+				possibleSpawnLocations.Add(randomPosition);
+			}
+
+			foreach (var spawnLocation in possibleSpawnLocations)
+			{
+				PhotonNetwork.Instantiate("Landmine", spawnLocation, Quaternion.identity);
+				overallSpawnCount++;
+			}
+		});
+
 		Debug.LogWarning($"Spawned {overallSpawnCount} of {LandminesPlugin.PossibleSpawnCount} landmines");
 	}
 
