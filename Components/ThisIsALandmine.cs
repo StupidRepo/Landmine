@@ -76,7 +76,11 @@ public class ThisIsALandmine : MonoBehaviour
 		press.Play();
 		yield return new WaitForSeconds(0.2f);
 
-		var explosionPrefab = LandminesPlugin.Bundle.GetAssetByName<GameObject>("Explosion");
+		var explosionPrefab = LandminesPlugin.Bundle.GetAssetByName<GameObject>("Explosion")!;
+		var expl = explosionPrefab.GetComponent<AOE>();
+		Debug.LogWarning(expl.radius);
+		expl.force = 30f;
+		
 		Instantiate(explosionPrefab, transform.position, Quaternion.identity, null);
 		
 		explosion.Play();
