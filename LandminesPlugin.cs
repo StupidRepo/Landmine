@@ -74,7 +74,7 @@ public class SecToRecordBeforeStepSetting: IntSetting, IExposedSetting {
 	// Prefer using the Mods category
 	public SettingCategory GetSettingCategory() => SettingCategory.Mods;
 
-	public string GetDisplayName() => "[Landmines] Seconds to record before stepping on a mine";
+	public string GetDisplayName() => "[Landmines] Seconds to record before stepping on a landmine";
 }
 
 [ContentWarningSetting]
@@ -86,5 +86,5 @@ public class SecToRecordAfterStepSetting: IntSetting, IExposedSetting {
 	// Prefer using the Mods category
 	public SettingCategory GetSettingCategory() => SettingCategory.Mods;
 
-	public string GetDisplayName() => "[Landmines] Seconds to record after stepping off a mine";
+	public string GetDisplayName() => "[Landmines] Seconds to record after stepping off a landmine";
 }
