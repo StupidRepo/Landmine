@@ -1,0 +1,9 @@
+"workshopitem"
+{
+	"appid"		        "2881650"
+	"publishedfileid"	"3397336043"
+	"contentfolder"		"C:\\Users\\Brad\\RiderProjects\\Landmines\\scmdrelease"
+	"previewfile"		"C:\\Users\\Brad\\RiderProjects\\Landmines\\preview.png"
+	"visibility"		"0"
+	"changenote"		"Update to v0.5 :P"
+}
