@@ -41,6 +41,8 @@ public class Mine : MonoBehaviour
 	private float local_SteppedOnTimestamp = 0f;
 	private float local_SteppedOffTimestamp = 0f;
 	
+	private Player? PlayerWhoSteppedOnMeAndGotUsIntoThisMessAnywayInTheFirstPlace;
+	
 	private void Awake()
 	{
 		var pv = gameObject.GetComponent<PhotonView>();
@@ -81,20 +83,20 @@ public class Mine : MonoBehaviour
 
 			if (player == Player.localPlayer)
 			{
-				Debug.LogWarning("Stepped on mine: " + Time.time);
+				Debug.LogWarning("I just stepped on mine: " + Time.time);
 				local_SteppedOnTimestamp = Time.time;
 			}
 		}
 		
 		if(IsExploding) return;
-		CallRPCSteppedOn();
+		CallRPCSteppedOn(player.photonView.ViewID);
 	}
 
-	private void CallRPCSteppedOn()
+	private void CallRPCSteppedOn(int playerWhoSteppedOn)
 	{
 		if(!PhotonNetwork.IsMasterClient) return;
 		
-		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(SteppedOn), ReliableType.Reliable, viewId);
+		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(SteppedOn), ReliableType.Reliable, viewId, playerWhoSteppedOn);
 	}
 	
 	public void  CallRPCExplode()
@@ -106,8 +108,17 @@ public class Mine : MonoBehaviour
 	}
 	
 	[CustomRPC]
-	public void SteppedOn()
+	public void SteppedOn(int playerWhoSteppedOn)
 	{
+		var player = PhotonView.Find(playerWhoSteppedOn).GetComponent<Player>();
+		if (player == null)
+		{
+			Debug.LogError("Player is null :P");
+			return;
+		};
+		PlayerWhoSteppedOnMeAndGotUsIntoThisMessAnywayInTheFirstPlace = player;
+		Debug.LogWarning("Player stepped on mine: " + player.photonView.Owner.NickName);
+		
 		if(press != null)
 			press.Play();
 		
@@ -153,7 +164,7 @@ public class Mine : MonoBehaviour
 			.Where(collider => collider != null).ToList();
 
 		var playerStillOnMine = playersOnTheMine.Any();
-		if(playersOnTheMine.All(player => player != Player.localPlayer) && !IsExploding && local_SteppedOnTimestamp > 0f)
+		if(playersOnTheMine.All(player => player != Player.localPlayer) && !IsExploding && local_SteppedOnTimestamp > 0f && PlayerWhoSteppedOnMeAndGotUsIntoThisMessAnywayInTheFirstPlace == Player.localPlayer)
 		{
 			local_SteppedOffTimestamp = Time.time;
 			var timeOnMine = local_SteppedOffTimestamp - local_SteppedOnTimestamp;
