@@ -25,8 +25,11 @@ public class AOEPatches
                 itemList.Add(itemComponent);
             else
             {
-                Debug.LogWarning("AOE: " + collider.name + " is not a player or item");
-                // if neither player nor item, continue
+                if (rb)
+                {
+                    Debug.LogWarning("No player or item found but a rigidbody was, adding force to rigidbody");
+                    rb.AddForce((rb.transform.position - __instance.transform.position).normalized * __instance.force, ForceMode.Impulse);
+                }
                 continue;
             }
             

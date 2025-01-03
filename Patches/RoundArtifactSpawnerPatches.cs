@@ -12,7 +12,7 @@ namespace Landmines.Patches;
 [HarmonyPatch(typeof(RoundArtifactSpawner))]
 public class RoundArtifactSpawnerPatches
 {
-	[HarmonyPatch("CreateArtifactSpawners")]
+	[HarmonyPatch(nameof(RoundArtifactSpawner.CreateArtifactSpawners))]
 	[HarmonyPostfix]
 	public static void SpawnLandminesPatch(ref RoundArtifactSpawner __instance)
 	{
