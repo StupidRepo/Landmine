@@ -176,7 +176,7 @@ public class Mine : MonoBehaviour
 				"This can't be good :o",
 				1,
 				(-timeOnMine)-LandminesPlugin.SecToRecordBeforeStep,
-				LandminesPlugin.SecToRecordBeforeStep+timeOnMine+LandminesPlugin.SecToRecordAfterStep, // duration is
+				LandminesPlugin.SecToRecordBeforeStep+timeOnMine+LandminesPlugin.SecToRecordAfterStep, // duration is:
 				// [configged] seconds before stepping on the mine
 				// + time on mine
 				// [configged] seconds after stepping on the mine
