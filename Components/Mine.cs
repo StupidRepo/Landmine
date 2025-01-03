@@ -51,39 +51,6 @@ public class Mine : MonoBehaviour
 		MyceliumNetwork.RegisterNetworkObject(this, LandminesPlugin.ModID, pv.ViewID);
 	}
 
-	// private void OnCollisionExit(Collision other)
-	// {
-	// 	if (!enabled)
-	// 		return;
-	// 	
-	// 	var player = other.gameObject.GetComponentInParent<Player>();
-	// 	if (player == null) return;
-	//
-	// 	if (player != Player.localPlayer || ShouldExplodeOnPlayerTouch || !local_WasSteppedOn) return;
-	// 	if(local_SteppedOnTimestamp == 0f) return;
-	// 	
-	// 	local_SteppedOffTimestamp = Time.time;
-	// 	var timeOnMine = local_SteppedOffTimestamp - local_SteppedOnTimestamp;
-	// 	
-	// 	Debug.LogWarning("TIME ON MINE: " + timeOnMine);
-	// 	SteamTimeline.AddTimelineEvent(
-	// 		"steam_bolt",
-	// 		"Landmine",
-	// 		"There's no way bro is recovering from this",
-	// 		0,
-	// 		-6,
-	// 		6+timeOnMine+4, // duration is
-	// 		// 6 seconds before stepping on the mine
-	// 		// + time on mine
-	// 		// + some extra time for the explosion
-	// 		// + player reaction
-	// 		ETimelineEventClipPriority.k_ETimelineEventClipPriority_Featured
-	// 	);
-	// 	
-	// 	local_SteppedOnTimestamp = 0f;
-	// 	local_SteppedOffTimestamp = 0f;
-	// }
-
 	private void OnCollisionEnter(Collision other)
 	{
 		if (!enabled)
@@ -113,18 +80,28 @@ public class Mine : MonoBehaviour
 		{
 			if (playersOnTheMine.Contains(player)) return;
 			playersOnTheMine.Add(player);
+
+			if (player == Player.localPlayer)
+			{
+				Debug.LogWarning("Stepped on mine: " + Time.time);
+				local_SteppedOnTimestamp = Time.time;
+			} else {
+				SteamTimeline.AddTimelineEvent(
+					"steam_person",
+					"Landmine Stepped On By Another Player",
+					$"{player.photonView.Owner.NickName} stepped on a landmine!",
+					1,
+					0,
+					0,
+					ETimelineEventClipPriority.k_ETimelineEventClipPriority_Featured
+				);
+			}
 			
 			if (local_playerWhoSteppedOn == null)
 				local_playerWhoSteppedOn = player;
 		}
-
-		if(IsExploding) return;
-		if (player == Player.localPlayer && !ShouldExplodeOnPlayerTouch)
-		{
-			Debug.LogWarning("Stepped on mine: " + Time.time);
-			local_SteppedOnTimestamp = Time.time;
-		}
 		
+		if(IsExploding) return;
 		CallRPCSteppedOn();
 	}
 
@@ -158,7 +135,21 @@ public class Mine : MonoBehaviour
 	[CustomRPC]
 	public void Explode()
 	{
+		if (local_playerWhoSteppedOn == Player.localPlayer && !IsExploding)
+		{
+			SteamTimeline.AddTimelineEvent(
+				"steam_explosion",
+				"Landmine Exploded",
+				"There's no way bro is recovering from this",
+				1,
+				0,
+				0,
+				ETimelineEventClipPriority.k_ETimelineEventClipPriority_Featured
+			);
+		}
+		
 		IsExploding = true;
+		
 		LandminesPlugin.Bundle.MakeExplosion(transform.position,
 			force, fall, innerRadius, outerRadius, damage);
 		
@@ -199,14 +190,14 @@ public class Mine : MonoBehaviour
 			SteamTimeline.AddTimelineEvent(
 				"steam_bolt",
 				"Landmine",
-				"There's no way bro is recovering from this",
-				0,
+				"This can't be good :o",
+				1,
 				(-timeOnMine)-LandminesPlugin.SecToRecordBeforeStep,
 				LandminesPlugin.SecToRecordBeforeStep+timeOnMine+LandminesPlugin.SecToRecordAfterStep, // duration is
 				// [configged] seconds before stepping on the mine
 				// + time on mine
 				// [configged] seconds after stepping on the mine
-				ETimelineEventClipPriority.k_ETimelineEventClipPriority_Featured
+				ETimelineEventClipPriority.k_ETimelineEventClipPriority_Standard
 			);
 			
 			local_SteppedOnTimestamp = 0f;
