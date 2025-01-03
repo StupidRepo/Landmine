@@ -135,19 +135,6 @@ public class Mine : MonoBehaviour
 	[CustomRPC]
 	public void Explode()
 	{
-		if (local_playerWhoSteppedOn == Player.localPlayer && !IsExploding)
-		{
-			SteamTimeline.AddTimelineEvent(
-				"steam_explosion",
-				"Landmine Exploded",
-				"There's no way bro is recovering from this",
-				1,
-				0,
-				0,
-				ETimelineEventClipPriority.k_ETimelineEventClipPriority_Featured
-			);
-		}
-		
 		IsExploding = true;
 		
 		LandminesPlugin.Bundle.MakeExplosion(transform.position,
@@ -198,6 +185,16 @@ public class Mine : MonoBehaviour
 				// + time on mine
 				// [configged] seconds after stepping on the mine
 				ETimelineEventClipPriority.k_ETimelineEventClipPriority_Standard
+			);
+
+			SteamTimeline.AddTimelineEvent(
+				"steam_explosion",
+				"Landmine Exploded",
+				"There's no way bro is recovering from this",
+				3,
+				0,
+				0,
+				ETimelineEventClipPriority.k_ETimelineEventClipPriority_Featured
 			);
 			
 			local_SteppedOnTimestamp = 0f;
