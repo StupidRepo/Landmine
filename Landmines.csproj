@@ -13,8 +13,8 @@
     <ItemGroup>
         <Reference Include="$(CWDir)\Content Warning_Data\Managed\*.dll" Private="false" Publicize="True"/>
         <Reference Include="$(CWDir)\Plugins\Itemz\*.dll" Private="false"/>
-        <Reference Include="$(MSBuildProjectDirectory)\Libs\*.dll" />
-        <Reference Include="C:\Program Files (x86)\Steam\steamapps\workshop\content\2881650\*\*.dll" Publicize="True" />
+<!--        <Reference Include="$(MSBuildProjectDirectory)\Libs\*.dll" />-->
+        <Reference Include="C:\Program Files (x86)\Steam\steamapps\workshop\content\2881650\3397332899\*.dll" Publicize="True" />
 <!--        <Reference Include="$(CWDir)\BepInEx\core\Bep*.dll" Private="false" Publicize="True" />-->
     </ItemGroup>
 
@@ -28,7 +28,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <EmbeddedResource Include="AssetBundles\ab" />
+        <EmbeddedResource Include="$(AssetBundle)" />
     </ItemGroup>
 
     <Target Name="CopyOutputFileToGame" AfterTargets="Build">
