@@ -1,19 +1,14 @@
 ﻿using System.Reflection;
-using INeedWorkshopDeps.Attributes;
 using Itemz;
 using Photon.Pun;
 using Steamworks;
-using Unity.Mathematics;
 using UnityEngine;
 using Zorro.Core.CLI;
 using Zorro.Settings;
-using SteamTimeline = Steamworks.SteamTimeline;
 
 namespace Landmines;
 
-[ContentWarningPlugin("stupidrepo.Landmines", "0.5", false)]
-[ContentWarningDependency(3384690922)] // MyceliumNetworking
-[ContentWarningDependency(3397332899)] // Itemz
+[ContentWarningPlugin("stupidrepo.Landmines", "0.6", false)]
 public static class LandminesPlugin
 {
 	public static readonly AssetBundleHandler Bundle;

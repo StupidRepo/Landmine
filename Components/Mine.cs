@@ -41,8 +41,6 @@ public class Mine : MonoBehaviour
 	private float local_SteppedOnTimestamp = 0f;
 	private float local_SteppedOffTimestamp = 0f;
 	
-	private Player? local_playerWhoSteppedOn = null;
-	
 	private void Awake()
 	{
 		var pv = gameObject.GetComponent<PhotonView>();
@@ -85,20 +83,7 @@ public class Mine : MonoBehaviour
 			{
 				Debug.LogWarning("Stepped on mine: " + Time.time);
 				local_SteppedOnTimestamp = Time.time;
-			} else {
-				SteamTimeline.AddTimelineEvent(
-					"steam_person",
-					"Landmine Stepped On By Another Player",
-					$"{player.photonView.Owner.NickName} stepped on a landmine!",
-					1,
-					0,
-					0,
-					ETimelineEventClipPriority.k_ETimelineEventClipPriority_Featured
-				);
 			}
-			
-			if (local_playerWhoSteppedOn == null)
-				local_playerWhoSteppedOn = player;
 		}
 		
 		if(IsExploding) return;
@@ -112,7 +97,7 @@ public class Mine : MonoBehaviour
 		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(SteppedOn), ReliableType.Reliable, viewId);
 	}
 	
-	public void CallRPCExplode()
+	public void  CallRPCExplode()
 	{
 		IsExploding = true;
 		
@@ -168,7 +153,7 @@ public class Mine : MonoBehaviour
 			.Where(collider => collider != null).ToList();
 
 		var playerStillOnMine = playersOnTheMine.Any();
-		if(playersOnTheMine.All(player => player != Player.localPlayer) && local_playerWhoSteppedOn == Player.localPlayer && !IsExploding)
+		if(playersOnTheMine.All(player => player != Player.localPlayer) && !IsExploding && local_SteppedOnTimestamp > 0f)
 		{
 			local_SteppedOffTimestamp = Time.time;
 			var timeOnMine = local_SteppedOffTimestamp - local_SteppedOnTimestamp;
@@ -199,7 +184,6 @@ public class Mine : MonoBehaviour
 			
 			local_SteppedOnTimestamp = 0f;
 			local_SteppedOffTimestamp = 0f;
-			local_playerWhoSteppedOn = null;
 		}
 
 		if (!playerStillOnMine && !IsExploding)

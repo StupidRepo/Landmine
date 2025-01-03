@@ -12,10 +12,6 @@
 
     <ItemGroup>
         <Reference Include="$(CWDir)\Content Warning_Data\Managed\*.dll" Private="false" Publicize="True"/>
-        <Reference Include="$(CWDir)\Plugins\Itemz\*.dll" Private="false"/>
-<!--        <Reference Include="$(MSBuildProjectDirectory)\Libs\*.dll" />-->
-        <Reference Include="C:\Program Files (x86)\Steam\steamapps\workshop\content\2881650\3397332899\*.dll" Publicize="True" />
-<!--        <Reference Include="$(CWDir)\BepInEx\core\Bep*.dll" Private="false" Publicize="True" />-->
     </ItemGroup>
 
     <!-- Use BepInEx's Assembly Publicizer to tell IDEs and the compiler that every field, method, etc. is public, in the game assemblies -->
