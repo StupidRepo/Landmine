@@ -188,7 +188,7 @@ public class Mine : MonoBehaviour
 				LandminesPlugin.SecToRecordBeforeStep+timeOnMine+LandminesPlugin.SecToRecordAfterStep, // duration is:
 				// [configged] seconds before stepping on the mine
 				// + time on mine
-				// [configged] seconds after stepping on the mine
+				// [configged] seconds after stepping off the mine
 				ETimelineEventClipPriority.k_ETimelineEventClipPriority_Standard
 			);
 
