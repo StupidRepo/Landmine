@@ -102,6 +102,7 @@ public class Mine : MonoBehaviour
 
 	public virtual void CallRPCSteppedOn(int playerWhoSteppedOn)
 	{
+		GetComponent<Rigidbody>().isKinematic = true;
 		if(!PhotonNetwork.IsMasterClient) return;
 		
 		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(SteppedOn), ReliableType.Reliable, networkId, playerWhoSteppedOn);
@@ -118,6 +119,8 @@ public class Mine : MonoBehaviour
 	[CustomRPC]
 	public virtual void SteppedOn(int playerWhoSteppedOn)
 	{
+		GetComponent<Rigidbody>().isKinematic = true;
+
 		var player = PhotonView.Find(playerWhoSteppedOn).GetComponent<Player>();
 		if (player == null)
 		{
@@ -129,8 +132,6 @@ public class Mine : MonoBehaviour
 		
 		if(press != null)
 			press.Play();
-		
-		GetComponent<Rigidbody>().isKinematic = true;
 		
 		if(ShouldExplodeOnPlayerTouch) Explode(); // just call explode because steppedon is already called on all clients,
                                             // so we can just call explode as that'll be called on all clients
