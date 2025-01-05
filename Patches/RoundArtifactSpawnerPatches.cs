@@ -1,10 +1,10 @@
 ﻿using HarmonyLib;
 using Landmines.Extensions;
+using MyceliumObjects.Components;
 using Photon.Pun;
 using Unity.AI.Navigation;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace Landmines.Patches;
@@ -26,8 +26,9 @@ public class RoundArtifactSpawnerPatches
 			var minY = bounds.max.y;
 			var maxY = bounds.min.y;
 
-			if(!SceneManager.GetActiveScene().name.Contains("Factory")) DoSampling(ref bounds, ref minY, ref maxY);
-
+			// if(!SceneManager.GetActiveScene().name.Contains("Factory")) DoSampling(ref bounds, ref minY, ref maxY);
+			DoSampling(ref bounds, ref minY, ref maxY);
+			
 			Debug.LogWarning($"About to spawn landmines - minY: {minY}, maxY: {maxY}");
 
 			var possibleSpawnLocations = new List<Vector3>();
@@ -46,7 +47,7 @@ public class RoundArtifactSpawnerPatches
 				// 50% chance for normal mine, 50% chance for impulse mine
 				var photonName = Random.value < 0.5f ? PhotonLandmineTypes.Normal : PhotonLandmineTypes.Impulse;
 				
-				PhotonNetwork.Instantiate(photonName, spawnLocation, Quaternion.identity);
+				Instantiator.Instance.InstantiateObject(photonName, LandminesPlugin.ModID, spawnLocation);
 				overallSpawnCount++;
 			}
 		});

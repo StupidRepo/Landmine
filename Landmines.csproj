@@ -21,14 +21,14 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="RugbugRedfern.MyceliumNetworking.CW" Version="1.0.14" />
-    </ItemGroup>
+    </ItemGroup> 
     
     <ItemGroup>
         <EmbeddedResource Include="$(AssetBundle)" />
     </ItemGroup>
 
     <Target Name="CopyOutputFileToGame" AfterTargets="Build">
-        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll;preview.png" DestinationFolder="$(CWDir)\Plugins\$(AssemblyName)\" Retries="60"/>
+        <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll;preview.png" DestinationFolder="$(CWDir)\Plugins\ModSlotC\" Retries="60"/>
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll;preview.png" DestinationFolder="$(MSBuildProjectDirectory)\scmdrelease\" Retries="60" Condition="'$(Configuration)' == 'Release'"/>
         <Copy SourceFiles="$(OutputPath)\$(AssemblyName).dll" DestinationFolder="$(UnityPluginsDir)" Condition="'$(UnityPluginsDir)' != ''" Retries="60"/>
     </Target>

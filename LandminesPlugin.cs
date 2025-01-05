@@ -1,14 +1,17 @@
 ﻿using System.Reflection;
-using Itemz;
+using Mono.Cecil;
+using MyceliumNetworking;
+using MyceliumObjects.Components;
 using Photon.Pun;
 using Steamworks;
 using UnityEngine;
 using Zorro.Core.CLI;
 using Zorro.Settings;
+using Object = UnityEngine.Object;
 
 namespace Landmines;
 
-[ContentWarningPlugin("stupidrepo.Landmines", "0.6", false)]
+[ContentWarningPlugin("stupidrepo.Landmines", "0.6.1", false)]
 public static class LandminesPlugin
 {
 	public static readonly AssetBundleHandler Bundle;
@@ -28,8 +31,13 @@ public static class LandminesPlugin
 		using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Landmines.lminemod");
 		Bundle = new AssetBundleHandler(AssetBundle.LoadFromStream(stream));
 		
-		Itemz.Itemz.RegisterItem(Bundle.GetAssetByName<Item>("NormalMineItem"), PhotonLandmineTypes.Normal, false);
-		Itemz.Itemz.RegisterItem(Bundle.GetAssetByName<Item>("ImpulseMineItem"), PhotonLandmineTypes.Impulse, false);
+		var gameObject = new GameObject("LandminesPluginLol")
+		{
+			hideFlags = HideFlags.HideAndDontSave
+		};
+
+		Object.DontDestroyOnLoad(gameObject);
+		gameObject.AddComponent<Components.TheActualPluginBecauseThingyModLoaderSucks>();
 		
 		Callback<LobbyEnter_t>.Create(OnLobbyEnter);
 	}
@@ -50,7 +58,7 @@ public static class LandminesPlugin
 			return;
 		}
 
-		PhotonNetwork.Instantiate(photonName, MainCamera.instance.GetDebugItemSpawnPos(), Quaternion.identity);
+		Instantiator.Instance.InstantiateObject(photonName, ModID, MainCamera.instance.GetDebugItemSpawnPos());
 	}
 
 	private static void OnLobbyEnter(LobbyEnter_t callback)

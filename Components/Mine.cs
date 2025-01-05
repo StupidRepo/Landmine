@@ -1,6 +1,7 @@
 using System.Collections;
 using Landmines.Extensions;
 using MyceliumNetworking;
+using MyceliumObjects.Components;
 using Photon.Pun;
 using Steamworks;
 using UnityEngine;
@@ -18,10 +19,10 @@ public class Mine : MonoBehaviour
 
 	[SerializeField] public Light? light;
 
-	private int viewId = 0;
+	private int networkId;
 	
-	private float beepTimer = 0f;
-	private float timeSinceSpawn = 0;
+	private float beepTimer;
+	private float timeSinceSpawn;
 	
 	private List<Player> playersOnTheMine = [];
 	
@@ -38,17 +39,24 @@ public class Mine : MonoBehaviour
 	
 	[SerializeField] public float damage = 150f;
 	
-	private float local_SteppedOnTimestamp = 0f;
-	private float local_SteppedOffTimestamp = 0f;
+	private float local_SteppedOnTimestamp;
+	private float local_SteppedOffTimestamp;
 	
 	private Player? PlayerWhoSteppedOnMeAndGotUsIntoThisMessAnywayInTheFirstPlace;
 	
-	private void Awake()
+	private void Start()
 	{
-		var pv = gameObject.GetComponent<PhotonView>();
-		viewId = pv.ViewID;
+		var pv = gameObject.GetComponent<MyceliumView>();
+		if (pv == null)
+		{
+			Debug.LogError("MyceliumView is null, destroying");
+			
+			Destroy(gameObject);
+			return;
+		}
 		
-		MyceliumNetwork.RegisterNetworkObject(this, LandminesPlugin.ModID, pv.ViewID);
+		networkId = pv.NetworkId;
+		MyceliumNetwork.RegisterNetworkObject(this, LandminesPlugin.ModID, networkId);
 	}
 
 	private void OnCollisionEnter(Collision other)
@@ -92,23 +100,23 @@ public class Mine : MonoBehaviour
 		CallRPCSteppedOn(player.photonView.ViewID);
 	}
 
-	private void CallRPCSteppedOn(int playerWhoSteppedOn)
+	public virtual void CallRPCSteppedOn(int playerWhoSteppedOn)
 	{
 		if(!PhotonNetwork.IsMasterClient) return;
 		
-		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(SteppedOn), ReliableType.Reliable, viewId, playerWhoSteppedOn);
+		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(SteppedOn), ReliableType.Reliable, networkId, playerWhoSteppedOn);
 	}
 	
-	public void  CallRPCExplode()
+	public virtual void CallRPCExplode()
 	{
 		IsExploding = true;
 		
 		if(!PhotonNetwork.IsMasterClient) return;
-		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(Explode), ReliableType.Reliable, viewId);
+		MyceliumNetwork.RPCMasked(LandminesPlugin.ModID, nameof(Explode), ReliableType.Reliable, networkId);
 	}
 	
 	[CustomRPC]
-	public void SteppedOn(int playerWhoSteppedOn)
+	public virtual void SteppedOn(int playerWhoSteppedOn)
 	{
 		var player = PhotonView.Find(playerWhoSteppedOn).GetComponent<Player>();
 		if (player == null)
@@ -122,14 +130,14 @@ public class Mine : MonoBehaviour
 		if(press != null)
 			press.Play();
 		
-		// GetComponent<Rigidbody>().isKinematic = true;
+		GetComponent<Rigidbody>().isKinematic = true;
 		
 		if(ShouldExplodeOnPlayerTouch) Explode(); // just call explode because steppedon is already called on all clients,
                                             // so we can just call explode as that'll be called on all clients
 	}
 	
 	[CustomRPC]
-	public void Explode()
+	public virtual void Explode()
 	{
 		IsExploding = true;
 		
@@ -215,6 +223,6 @@ public class Mine : MonoBehaviour
 	
 	private void OnDestroy()
 	{
-		MyceliumNetwork.DeregisterNetworkObject(this, LandminesPlugin.ModID, viewId);
+		MyceliumNetwork.DeregisterNetworkObject(this, LandminesPlugin.ModID, networkId);
 	}
 }
